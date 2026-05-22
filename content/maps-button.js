@@ -1,34 +1,70 @@
 const BUTTON_ID = "quick-google-maps-button";
+const SEARCH_ENGINE_BUTTON_SCOPES = Object.freeze({
+  BOTH: "both",
+  GOOGLE: "google",
+  BING: "bing"
+});
 const DEFAULT_SETTINGS = Object.freeze({
   contextSearchEnabled: true,
   contextDirectionsEnabled: true,
-  searchEngineButtonEnabled: true
+  searchEngineButtonEnabled: true,
+  searchEngineButtonScope: SEARCH_ENGINE_BUTTON_SCOPES.BOTH
 });
+
+let currentSettings = DEFAULT_SETTINGS;
+let observer;
 
 init();
 
 async function init() {
-  const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
+  currentSettings = normalizeSettings(await chrome.storage.sync.get(DEFAULT_SETTINGS));
+  syncButton();
+  observeSearchPageChanges();
 
-  if (!settings.searchEngineButtonEnabled) {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== "sync" || !hasButtonSettingChange(changes)) {
+      return;
+    }
+
+    currentSettings = normalizeSettings({
+      ...currentSettings,
+      ...Object.fromEntries(
+        Object.entries(changes).map(([key, change]) => [key, change.newValue])
+      )
+    });
+    syncButton();
+  });
+}
+
+function syncButton() {
+  if (!shouldRenderButton()) {
     removeButton();
     return;
   }
 
   renderButton();
-  observeSearchPageChanges();
+}
 
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName !== "sync" || !Object.hasOwn(changes, "searchEngineButtonEnabled")) {
-      return;
-    }
+function shouldRenderButton() {
+  if (!currentSettings.searchEngineButtonEnabled) {
+    return false;
+  }
 
-    if (changes.searchEngineButtonEnabled.newValue) {
-      renderButton();
-    } else {
-      removeButton();
-    }
-  });
+  if (isGoogle()) {
+    return [
+      SEARCH_ENGINE_BUTTON_SCOPES.BOTH,
+      SEARCH_ENGINE_BUTTON_SCOPES.GOOGLE
+    ].includes(currentSettings.searchEngineButtonScope);
+  }
+
+  if (isBing()) {
+    return [
+      SEARCH_ENGINE_BUTTON_SCOPES.BOTH,
+      SEARCH_ENGINE_BUTTON_SCOPES.BING
+    ].includes(currentSettings.searchEngineButtonScope);
+  }
+
+  return false;
 }
 
 function renderButton() {
@@ -63,7 +99,7 @@ function updateButtonHref() {
     return;
   }
 
-  button.href = buildMapsSearchUrl(query);
+  button.href = buildMapsSearchUrl(query, getMapsContext());
 }
 
 function removeButton() {
@@ -95,16 +131,16 @@ function findInsertionPoint() {
       || document.querySelector("input[name='q']");
   }
 
-  return document.querySelector("input[name='q']");
+  return null;
 }
 
 function observeSearchPageChanges() {
-  const observer = new MutationObserver(() => {
-    if (!document.getElementById(BUTTON_ID)) {
-      renderButton();
-    } else {
-      updateButtonHref();
-    }
+  if (observer) {
+    return;
+  }
+
+  observer = new MutationObserver(() => {
+    syncButton();
   });
 
   observer.observe(document.body, {
@@ -113,15 +149,93 @@ function observeSearchPageChanges() {
   });
 }
 
+function getMapsContext() {
+  return {
+    mapsOrigin: getGoogleMapsOrigin(),
+    language: getPageLanguage()
+  };
+}
+
+function getGoogleMapsOrigin() {
+  if (isGoogle()) {
+    return window.location.origin;
+  }
+
+  return "https://www.google.com";
+}
+
+function getPageLanguage() {
+  const url = new URL(window.location.href);
+  const googleLanguage = url.searchParams.get("hl");
+  const bingLanguage = url.searchParams.get("setlang")
+    || normalizeBingMarket(url.searchParams.get("mkt"));
+  const htmlLanguage = document.documentElement.lang;
+
+  return normalizeLanguage(googleLanguage || bingLanguage || htmlLanguage);
+}
+
+function normalizeBingMarket(market) {
+  if (!market) {
+    return "";
+  }
+
+  return market.split("-")[0];
+}
+
+function normalizeLanguage(language) {
+  const normalized = (language || "").trim().toLowerCase();
+  return /^[a-z]{2,3}(-[a-z]{2})?$/.test(normalized) ? normalized : "";
+}
+
 function isGoogle() {
-  return window.location.hostname.includes("google.");
+  return /^www\.google\./.test(window.location.hostname);
 }
 
 function isBing() {
   return window.location.hostname === "www.bing.com";
 }
 
-function buildMapsSearchUrl(query) {
-  const encodedQuery = encodeURIComponent(query.trim());
-  return `https://www.google.com/maps/search/?api=1&query=${encodedQuery}`;
+function buildMapsSearchUrl(query, context = {}) {
+  const origin = normalizeGoogleMapsOrigin(context.mapsOrigin);
+  const url = new URL(`${origin}/maps/search/`);
+  url.searchParams.set("api", "1");
+  url.searchParams.set("query", query.trim());
+
+  if (context.language) {
+    url.searchParams.set("hl", context.language);
+  }
+
+  return url.toString();
+}
+
+function normalizeGoogleMapsOrigin(origin) {
+  try {
+    const url = new URL(origin);
+    if (url.protocol === "https:" && /^www\.google\./.test(url.hostname)) {
+      return url.origin;
+    }
+  } catch {
+    return "https://www.google.com";
+  }
+
+  return "https://www.google.com";
+}
+
+function normalizeSettings(settings) {
+  const scope = Object.values(SEARCH_ENGINE_BUTTON_SCOPES).includes(settings.searchEngineButtonScope)
+    ? settings.searchEngineButtonScope
+    : DEFAULT_SETTINGS.searchEngineButtonScope;
+
+  return {
+    ...DEFAULT_SETTINGS,
+    ...settings,
+    searchEngineButtonScope: scope
+  };
+}
+
+function hasButtonSettingChange(changes) {
+  return [
+    "searchEngineButtonEnabled",
+    "searchEngineButtonScope"
+  ].some((key) => Object.hasOwn(changes, key));
 }

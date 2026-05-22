@@ -58,6 +58,18 @@ h1 {
   padding: 16px;
 }
 
+.setting-group {
+  cursor: default;
+  grid-template-columns: 1fr;
+}
+
+.setting-main {
+  cursor: pointer;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: auto 1fr;
+}
+
 .setting:hover {
   border-color: #b8c7e6;
 }
@@ -67,6 +79,33 @@ h1 {
   height: 20px;
   margin: 1px 0 0;
   width: 20px;
+}
+
+.scope-options {
+  border: 0;
+  display: grid;
+  gap: 8px;
+  margin: 2px 0 0 34px;
+  padding: 0;
+}
+
+.scope-options label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.scope-options input {
+  height: 16px;
+  margin: 0;
+  width: 16px;
+}
+
+.scope-options span {
+  color: #3c4043;
+  font-size: 14px;
 }
 
 .setting strong {
@@ -97,5 +136,9 @@ h1 {
 
   h1 {
     font-size: 24px;
+  }
+
+  .scope-options {
+    margin-left: 0;
   }
 }

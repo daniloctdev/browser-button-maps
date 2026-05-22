@@ -1,5 +1,6 @@
 import {
   DEFAULT_SETTINGS,
+  SEARCH_ENGINE_BUTTON_SCOPES,
   getSettings,
   saveSettings
 } from "../src/settings.js";
@@ -18,21 +19,32 @@ form.addEventListener("change", async () => {
 async function restoreOptions() {
   const settings = await getSettings();
 
-  for (const key of Object.keys(DEFAULT_SETTINGS)) {
+  for (const [key, value] of Object.entries(settings)) {
     const field = form.elements[key];
-    if (field) {
-      field.checked = Boolean(settings[key]);
+
+    if (!field) {
+      continue;
+    }
+
+    if (field instanceof RadioNodeList) {
+      field.value = value;
+    } else {
+      field.checked = Boolean(value);
     }
   }
 }
 
 function readFormSettings() {
-  return Object.fromEntries(
-    Object.keys(DEFAULT_SETTINGS).map((key) => [
-      key,
-      Boolean(form.elements[key]?.checked)
-    ])
-  );
+  const scope = Object.values(SEARCH_ENGINE_BUTTON_SCOPES).includes(form.elements.searchEngineButtonScope.value)
+    ? form.elements.searchEngineButtonScope.value
+    : DEFAULT_SETTINGS.searchEngineButtonScope;
+
+  return {
+    contextSearchEnabled: Boolean(form.elements.contextSearchEnabled.checked),
+    contextDirectionsEnabled: Boolean(form.elements.contextDirectionsEnabled.checked),
+    searchEngineButtonEnabled: Boolean(form.elements.searchEngineButtonEnabled.checked),
+    searchEngineButtonScope: scope
+  };
 }
 
 function showStatus(message) {
