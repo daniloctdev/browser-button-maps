@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Cerca indirizzo su Google Maps",
+  "description": "Cerca indirizzi selezionati su Google Maps e aggiunge un pulsante Maps a Google e Bing.",
+  "version": "0.1.0",
+  "permissions": ["contextMenus", "storage", "tabs"],
+  "host_permissions": [
+    "https://www.google.com/*",
+    "https://www.google.it/*",
+    "https://www.bing.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.google.com/search*",
+        "https://www.google.it/search*",
+        "https://www.bing.com/search*"
+      ],
+      "js": ["content/maps-button.js"],
+      "css": ["content/maps-button.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "Impostazioni Maps",
+    "default_popup": "options/options.html"
+  }
+}

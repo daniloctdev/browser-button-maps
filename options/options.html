@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Impostazioni Maps</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="panel" aria-labelledby="title">
+        <p class="eyebrow">Estensione Chrome / Edge</p>
+        <h1 id="title">Cerca indirizzi su Google Maps</h1>
+
+        <form id="settings-form" class="settings">
+          <label class="setting">
+            <input type="checkbox" name="contextSearchEnabled">
+            <span>
+              <strong>Ricerca da testo selezionato</strong>
+              <small>Aggiunge al menu contestuale “Cerca su Google Maps”.</small>
+            </span>
+          </label>
+
+          <label class="setting">
+            <input type="checkbox" name="contextDirectionsEnabled">
+            <span>
+              <strong>Indicazioni da testo selezionato</strong>
+              <small>Aggiunge al menu contestuale “Indicazioni con Google Maps”.</small>
+            </span>
+          </label>
+
+          <label class="setting">
+            <input type="checkbox" name="searchEngineButtonEnabled">
+            <span>
+              <strong>Pulsante Maps su Google e Bing</strong>
+              <small>Mostra un pulsante per cercare la query corrente su maps.google.com.</small>
+            </span>
+          </label>
+        </form>
+
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
