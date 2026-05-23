@@ -200,29 +200,53 @@ function isInGoogleTabs(element) {
 }
 
 function findBingTabInsertionPoint() {
-  const mapSelectors = [
-    "#b-scopeList a[href*='/maps']",
-    "#b-scopeList a[href*='maps']"
-  ];
+  const scopeList = document.querySelector("#b-scopeList")
+    || document.querySelector(".b_scopebar")
+    || document.querySelector("[role='navigation']");
 
-  for (const selector of mapSelectors) {
-    for (const tab of document.querySelectorAll(selector)) {
-      const tabItem = tab.closest("li") || tab;
+  if (!scopeList) {
+    return findBingSearchBoxInsertionPoint();
+  }
 
-      if (isInBingTabs(tabItem)) {
-        return { element: tabItem, position: "beforebegin", wrap: "li" };
-      }
+  for (const tab of scopeList.querySelectorAll("a[href*='/maps'], a[href*='maps']")) {
+    const tabItem = tab.closest("li") || tab;
+
+    if (isInBingTabs(tabItem)) {
+      return getBingSiblingPlacement(tabItem, "beforebegin");
     }
   }
 
-  const tabsContainer = document.querySelector("#b-scopeList ul")
-    || document.querySelector("#b-scopeList");
+  const activeTab = scopeList.querySelector(".b_active, [aria-current='page']");
+  if (activeTab) {
+    const tabItem = activeTab.closest("li") || activeTab;
+    return getBingSiblingPlacement(tabItem, "afterend");
+  }
 
-  return tabsContainer ? { element: tabsContainer, position: "beforeend", wrap: "li" } : null;
+  const listContainer = scopeList.querySelector("ul, ol");
+  if (listContainer) {
+    return { element: listContainer, position: "beforeend", wrap: "li" };
+  }
+
+  return { element: scopeList, position: "beforeend", wrap: "div" };
+}
+
+function getBingSiblingPlacement(element, position) {
+  return {
+    element,
+    position,
+    wrap: element.tagName === "LI" ? "li" : "div"
+  };
+}
+
+function findBingSearchBoxInsertionPoint() {
+  const input = document.querySelector("#sb_form_q")
+    || document.querySelector("input[name='q']");
+
+  return input ? { element: input, position: "afterend" } : null;
 }
 
 function isInBingTabs(element) {
-  return Boolean(element.closest("#b-scopeList"));
+  return Boolean(element.closest("#b-scopeList, .b_scopebar, [role='navigation']"));
 }
 
 function observeSearchPageChanges() {
