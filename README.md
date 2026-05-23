@@ -6,7 +6,7 @@ Estensione Chrome/Edge Manifest V3 per cercare rapidamente indirizzi su Google M
 
 - Aggiunge al menu contestuale una voce per cercare su Google Maps il testo selezionato.
 - Aggiunge al menu contestuale una voce per ottenere indicazioni stradali verso il testo selezionato.
-- Aggiunge un pulsante `Maps` nelle pagine di ricerca Google e Bing.
+- Aggiunge un pulsante `GMaps` nelle pagine di ricerca Google e Bing.
 - Permette di scegliere se mostrare il pulsante su Google, su Bing o su entrambi.
 - Mantiene il TLD Google originale quando il pulsante viene usato da Google, ad esempio `google.it` apre `google.it/maps`.
 - Propaga la lingua della pagina quando disponibile tramite parametro `hl`.
@@ -21,7 +21,7 @@ Estensione Chrome/Edge Manifest V3 per cercare rapidamente indirizzi su Google M
 
 ## Uso
 
-Seleziona un indirizzo su una pagina web, fai clic con il tasto destro e scegli una delle voci Google Maps. Nelle ricerche Google e Bing puoi usare il pulsante `Maps` per aprire subito la query corrente su Google Maps.
+Seleziona un indirizzo su una pagina web, fai clic con il tasto destro e scegli una delle voci Google Maps. Nelle ricerche Google e Bing puoi usare il pulsante `GMaps` per aprire subito la query corrente su Google Maps.
 
 ## Impostazioni
 
@@ -29,7 +29,7 @@ Apri il popup dell'estensione o la pagina opzioni per gestire:
 
 - Ricerca da testo selezionato.
 - Indicazioni da testo selezionato.
-- Pulsante Maps su Google e Bing.
+- Pulsante GMaps su Google e Bing.
 - Ambito del pulsante: Google e Bing, solo Google, oppure solo Bing.
 
 ## Struttura

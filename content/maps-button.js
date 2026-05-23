@@ -78,15 +78,16 @@ function renderButton() {
   anchor.className = "quick-google-maps-button";
   anchor.target = "_blank";
   anchor.rel = "noopener noreferrer";
-  anchor.textContent = "Maps";
+  anchor.textContent = "GMaps";
   anchor.setAttribute("aria-label", "Cerca questa query su Google Maps");
+  anchor.dataset.engine = getCurrentEngine();
 
   const host = findInsertionPoint();
   if (!host) {
     return;
   }
 
-  host.insertAdjacentElement("afterend", anchor);
+  host.element.insertAdjacentElement(host.position, anchor);
   updateButtonHref();
 }
 
@@ -120,18 +121,43 @@ function getCurrentSearchQuery() {
 
 function findInsertionPoint() {
   if (isGoogle()) {
-    return document.querySelector("form[role='search'] textarea[name='q']")
-      || document.querySelector("form[role='search'] input[name='q']")
-      || document.querySelector("textarea[name='q']")
-      || document.querySelector("input[name='q']");
+    return findGoogleTabInsertionPoint();
   }
 
   if (isBing()) {
-    return document.querySelector("#sb_form_q")
+    const input = document.querySelector("#sb_form_q")
       || document.querySelector("input[name='q']");
+
+    return input ? { element: input, position: "afterend" } : null;
   }
 
   return null;
+}
+
+function findGoogleTabInsertionPoint() {
+  const tabSelectors = [
+    "a[href*='tbm=isch']",
+    "a[href*='udm=2']",
+    "a[href*='tbm=lcl']",
+    "a[href*='/search'][role='link']"
+  ];
+
+  for (const selector of tabSelectors) {
+    for (const tab of document.querySelectorAll(selector)) {
+      const tabItem = tab.closest("div[role='listitem']") || tab;
+
+      if (isInGoogleTabs(tabItem)) {
+        return { element: tabItem, position: "beforebegin" };
+      }
+    }
+  }
+
+  const tabsContainer = document.querySelector("#hdtb, div[role='navigation']");
+  return tabsContainer ? { element: tabsContainer, position: "beforeend" } : null;
+}
+
+function isInGoogleTabs(element) {
+  return Boolean(element.closest("#hdtb, div[role='navigation']"));
 }
 
 function observeSearchPageChanges() {
@@ -193,6 +219,18 @@ function isGoogle() {
 
 function isBing() {
   return window.location.hostname === "www.bing.com";
+}
+
+function getCurrentEngine() {
+  if (isGoogle()) {
+    return "google";
+  }
+
+  if (isBing()) {
+    return "bing";
+  }
+
+  return "";
 }
 
 function buildMapsSearchUrl(query, context = {}) {
