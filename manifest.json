@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Cerca indirizzo su Google Maps",
-  "description": "Cerca indirizzi selezionati su Google Maps e aggiunge un pulsante GMaps a Google e Bing.",
+  "description": "Cerca indirizzi selezionati su Google Maps e aggiunge pulsanti Maps/GMaps a Google e Bing.",
   "version": "0.1.0",
+  "homepage_url": "https://github.com/daniloctdev/browser-button-maps",
   "permissions": [
     "contextMenus",
     "storage",

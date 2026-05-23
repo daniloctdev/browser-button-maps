@@ -1,4 +1,5 @@
 const BUTTON_ID = "quick-google-maps-button";
+const WRAPPER_ID = "quick-google-maps-tab";
 const SEARCH_ENGINE_BUTTON_SCOPES = Object.freeze({
   BOTH: "both",
   GOOGLE: "google",
@@ -69,6 +70,7 @@ function shouldRenderButton() {
 
 function renderButton() {
   if (document.getElementById(BUTTON_ID)) {
+    syncButtonLabel();
     updateButtonHref();
     return;
   }
@@ -78,17 +80,41 @@ function renderButton() {
   anchor.className = "quick-google-maps-button";
   anchor.target = "_blank";
   anchor.rel = "noopener noreferrer";
-  anchor.textContent = "GMaps";
   anchor.setAttribute("aria-label", "Cerca questa query su Google Maps");
   anchor.dataset.engine = getCurrentEngine();
+  anchor.textContent = getButtonLabel();
 
-  const host = findInsertionPoint();
-  if (!host) {
+  const placement = findInsertionPoint();
+  if (!placement) {
     return;
   }
 
-  host.element.insertAdjacentElement(host.position, anchor);
+  if (placement.wrap) {
+    const wrapper = document.createElement(placement.wrap);
+    wrapper.id = WRAPPER_ID;
+    wrapper.className = "quick-google-maps-tab";
+    wrapper.dataset.engine = getCurrentEngine();
+    wrapper.setAttribute("role", "listitem");
+    wrapper.append(anchor);
+    placement.element.insertAdjacentElement(placement.position, wrapper);
+  } else {
+    placement.element.insertAdjacentElement(placement.position, anchor);
+  }
+
   updateButtonHref();
+}
+
+function syncButtonLabel() {
+  const button = document.getElementById(BUTTON_ID);
+  if (button) {
+    button.textContent = getButtonLabel();
+    button.dataset.engine = getCurrentEngine();
+  }
+
+  const wrapper = document.getElementById(WRAPPER_ID);
+  if (wrapper) {
+    wrapper.dataset.engine = getCurrentEngine();
+  }
 }
 
 function updateButtonHref() {
@@ -104,6 +130,7 @@ function updateButtonHref() {
 }
 
 function removeButton() {
+  document.getElementById(WRAPPER_ID)?.remove();
   document.getElementById(BUTTON_ID)?.remove();
 }
 
@@ -125,10 +152,7 @@ function findInsertionPoint() {
   }
 
   if (isBing()) {
-    const input = document.querySelector("#sb_form_q")
-      || document.querySelector("input[name='q']");
-
-    return input ? { element: input, position: "afterend" } : null;
+    return findBingTabInsertionPoint();
   }
 
   return null;
@@ -147,17 +171,46 @@ function findGoogleTabInsertionPoint() {
       const tabItem = tab.closest("div[role='listitem']") || tab;
 
       if (isInGoogleTabs(tabItem)) {
-        return { element: tabItem, position: "beforebegin" };
+        return { element: tabItem, position: "beforebegin", wrap: "div" };
       }
     }
   }
 
   const tabsContainer = document.querySelector("#hdtb, div[role='navigation']");
-  return tabsContainer ? { element: tabsContainer, position: "beforeend" } : null;
+  return tabsContainer ? { element: tabsContainer, position: "beforeend", wrap: "div" } : null;
 }
 
 function isInGoogleTabs(element) {
   return Boolean(element.closest("#hdtb, div[role='navigation']"));
+}
+
+function findBingTabInsertionPoint() {
+  const mapSelectors = [
+    "#b-scopeList a[href*='/maps']",
+    "#b-scopeList a[href*='maps']",
+    "nav a[href*='/maps']",
+    "nav a[href*='maps']"
+  ];
+
+  for (const selector of mapSelectors) {
+    for (const tab of document.querySelectorAll(selector)) {
+      const tabItem = tab.closest("li") || tab;
+
+      if (isInBingTabs(tabItem)) {
+        return { element: tabItem, position: "beforebegin", wrap: "li" };
+      }
+    }
+  }
+
+  const tabsContainer = document.querySelector("#b-scopeList ul")
+    || document.querySelector("#b-scopeList")
+    || document.querySelector("nav ul");
+
+  return tabsContainer ? { element: tabsContainer, position: "beforeend", wrap: "li" } : null;
+}
+
+function isInBingTabs(element) {
+  return Boolean(element.closest("#b-scopeList, nav"));
 }
 
 function observeSearchPageChanges() {
@@ -231,6 +284,10 @@ function getCurrentEngine() {
   }
 
   return "";
+}
+
+function getButtonLabel() {
+  return isGoogle() ? "Maps" : "GMaps";
 }
 
 function buildMapsSearchUrl(query, context = {}) {

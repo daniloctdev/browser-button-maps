@@ -1,5 +1,9 @@
 .DS_Store
 Thumbs.db
+.env
+.env.*
+*.pem
+*.key
 *.zip
 dist/
 node_modules/

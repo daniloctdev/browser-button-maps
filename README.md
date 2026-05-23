@@ -1,38 +1,100 @@
-# Cerca indirizzo su Google Maps
+# Browser Button Maps
 
-Estensione Chrome/Edge Manifest V3 per cercare rapidamente indirizzi su Google Maps.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Chrome](https://img.shields.io/badge/Chrome-Compatible-4285F4.svg)](#compatibilita)
+[![Edge](https://img.shields.io/badge/Edge-Compatible-0078D7.svg)](#compatibilita)
 
-## Cosa fa
+Estensione Chrome/Edge Manifest V3 per cercare velocemente indirizzi su Google Maps partendo da testo selezionato, Google Search o Bing Search.
 
-- Aggiunge al menu contestuale una voce per cercare su Google Maps il testo selezionato.
-- Aggiunge al menu contestuale una voce per ottenere indicazioni stradali verso il testo selezionato.
-- Aggiunge un pulsante `GMaps` nelle pagine di ricerca Google e Bing.
-- Permette di scegliere se mostrare il pulsante su Google, su Bing o su entrambi.
-- Mantiene il TLD Google originale quando il pulsante viene usato da Google, ad esempio `google.it` apre `google.it/maps`.
-- Propaga la lingua della pagina quando disponibile tramite parametro `hl`.
-- Permette di attivare o disattivare singolarmente le tre funzioni.
+Repository: [daniloctdev/browser-button-maps](https://github.com/daniloctdev/browser-button-maps)
 
-## Installazione in sviluppo
+## Italiano
+
+### Funzionalita
+
+- Cerca su Google Maps il testo selezionato da qualsiasi pagina web.
+- Apre le indicazioni stradali verso il testo selezionato.
+- Aggiunge un pulsante `Maps` nella barra dei risultati Google.
+- Aggiunge un pulsante `GMaps` nella barra dei risultati Bing.
+- Permette di mostrare il pulsante su Google, su Bing o su entrambi.
+- Mantiene il dominio Google originale quando possibile, per esempio `google.it` apre `google.it/maps`.
+- Propaga la lingua della pagina a Google Maps quando disponibile.
+- Ogni funzione puo essere attivata o disattivata dalla pagina impostazioni.
+
+### Installazione in sviluppo
 
 1. Apri `chrome://extensions` oppure `edge://extensions`.
 2. Attiva `Modalita sviluppatore`.
 3. Clicca `Carica estensione non pacchettizzata`.
-4. Seleziona questa cartella di progetto.
+4. Seleziona la cartella del progetto.
 
-## Uso
+### Uso
 
-Seleziona un indirizzo su una pagina web, fai clic con il tasto destro e scegli una delle voci Google Maps. Nelle ricerche Google e Bing puoi usare il pulsante `GMaps` per aprire subito la query corrente su Google Maps.
+Seleziona un indirizzo in una pagina web, fai clic con il tasto destro e scegli una voce Google Maps dal menu contestuale.
 
-## Impostazioni
+Nelle pagine di ricerca:
 
-Apri il popup dell'estensione o la pagina opzioni per gestire:
+- Google mostra `Maps` nella barra dei risultati.
+- Bing mostra `GMaps` nella barra dei risultati.
+
+### Impostazioni
+
+Dal popup o dalla pagina opzioni puoi gestire:
 
 - Ricerca da testo selezionato.
 - Indicazioni da testo selezionato.
-- Pulsante GMaps su Google e Bing.
+- Pulsante nei motori di ricerca.
 - Ambito del pulsante: Google e Bing, solo Google, oppure solo Bing.
 
-## Struttura
+### Compatibilita
+
+- Google Chrome con supporto Manifest V3.
+- Microsoft Edge con supporto Manifest V3.
+
+## English
+
+### Features
+
+- Search selected text on Google Maps from any webpage.
+- Open Google Maps directions to the selected text.
+- Adds a `Maps` button to Google Search results.
+- Adds a `GMaps` button to Bing Search results.
+- Lets you show the search button on Google, Bing, or both.
+- Preserves the current Google domain when possible, for example `google.it` opens `google.it/maps`.
+- Passes the page language to Google Maps when available.
+- Each feature can be enabled or disabled from the options page.
+
+### Development Install
+
+1. Open `chrome://extensions` or `edge://extensions`.
+2. Enable `Developer mode`.
+3. Click `Load unpacked`.
+4. Select this project folder.
+
+### Usage
+
+Select an address on a webpage, right-click it, and choose one of the Google Maps context menu actions.
+
+On search result pages:
+
+- Google shows `Maps` in the result navigation bar.
+- Bing shows `GMaps` in the result navigation bar.
+
+### Settings
+
+From the popup or options page you can configure:
+
+- Search selected text.
+- Directions to selected text.
+- Search engine result button.
+- Button scope: Google and Bing, Google only, or Bing only.
+
+### Compatibility
+
+- Google Chrome with Manifest V3 support.
+- Microsoft Edge with Manifest V3 support.
+
+## Project Structure
 
 ```text
 manifest.json
@@ -48,8 +110,21 @@ options/
   options.js
 docs/
   PLAN.md
+LICENSE
 ```
 
-## Note tecniche
+## Technical Notes
 
-Il progetto usa Manifest V3 e `chrome.storage.sync` per mantenere sincronizzate le impostazioni tra browser compatibili. Gli URL Maps vengono generati con gli endpoint `https://www.google.com/maps/search/?api=1` e `https://www.google.com/maps/dir/?api=1`. Per il pulsante su Google viene preservata l'origine corrente, per esempio `https://www.google.it` o `https://www.google.co.uk`; su Bing viene usato `https://www.google.com` e viene mantenuta la lingua rilevabile da `setlang`, `mkt` o `lang` HTML quando disponibile. Il manifest usa `include_globs` per coprire i TLD Google internazionali, dato che i match pattern Chrome non supportano direttamente `www.google.*` come host.
+- Built with Manifest V3.
+- Uses `chrome.storage.sync` for settings.
+- Uses the Google Maps URLs `https://www.google.com/maps/search/?api=1` and `https://www.google.com/maps/dir/?api=1`.
+- Uses `include_globs` to cover international Google TLDs because Chrome match patterns do not support `www.google.*` directly as a host.
+- No external runtime dependencies are required.
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
+
+Copyright 2026 Danilo Carbonaro.
+
+Fatto con amore <3 a Catania.

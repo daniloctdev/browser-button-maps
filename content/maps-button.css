@@ -1,56 +1,66 @@
+.quick-google-maps-tab {
+  align-items: stretch;
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .quick-google-maps-button {
   align-items: center;
-  background: #0b57d0;
-  border: 1px solid #0b57d0;
-  border-radius: 18px;
-  box-sizing: border-box;
-  color: #fff !important;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: inherit !important;
   display: inline-flex;
-  font: 500 14px/1 Arial, sans-serif;
-  height: 36px;
   justify-content: center;
-  margin-left: 8px;
-  min-width: 68px;
-  padding: 0 14px;
+  min-width: auto;
+  position: relative;
   text-decoration: none !important;
-  vertical-align: middle;
   white-space: nowrap;
   z-index: 2147483647;
 }
 
 .quick-google-maps-button:hover {
-  background: #0842a0;
-  border-color: #0842a0;
-  color: #fff !important;
+  background: transparent;
+  border-color: transparent;
+  color: inherit !important;
   text-decoration: none !important;
 }
 
 .quick-google-maps-button:focus {
-  outline: 2px solid #fbbc04;
-  outline-offset: 2px;
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+.quick-google-maps-tab[data-engine="google"] {
+  height: 48px;
 }
 
 .quick-google-maps-button[data-engine="google"] {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  color: inherit !important;
   font: 500 14px/1.2 Arial, sans-serif;
-  height: 39px;
+  height: 100%;
   margin: 0 0 0 14px;
-  min-width: auto;
-  padding: 0 2px;
-  position: relative;
+  padding: 1px 2px 0;
 }
 
-.quick-google-maps-button[data-engine="google"]:hover {
-  background: transparent;
-  border-color: transparent;
-  color: inherit !important;
+.quick-google-maps-tab[data-engine="bing"] {
+  height: 43px;
+}
+
+.quick-google-maps-button[data-engine="bing"] {
+  font: 400 12px/1.2 Arial, sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0 14px;
 }
 
 .quick-google-maps-button[data-engine="google"]:hover::after,
-.quick-google-maps-button[data-engine="google"]:focus::after {
+.quick-google-maps-button[data-engine="google"]:focus::after,
+.quick-google-maps-button[data-engine="bing"]:hover::after,
+.quick-google-maps-button[data-engine="bing"]:focus::after {
   background: currentColor;
   border-radius: 1px 1px 0 0;
   bottom: 0;
@@ -60,4 +70,16 @@
   opacity: 0.65;
   position: absolute;
   right: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .quick-google-maps-button:focus {
+    outline-color: rgba(232, 234, 237, 0.85);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .quick-google-maps-button:focus {
+    outline-color: rgba(60, 64, 67, 0.85);
+  }
 }
