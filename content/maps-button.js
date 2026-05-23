@@ -14,6 +14,7 @@ const DEFAULT_SETTINGS = Object.freeze({
 
 let currentSettings = DEFAULT_SETTINGS;
 let observer;
+let syncQueued = false;
 
 init();
 
@@ -94,7 +95,6 @@ function renderButton() {
     wrapper.id = WRAPPER_ID;
     wrapper.className = "quick-google-maps-tab";
     wrapper.dataset.engine = getCurrentEngine();
-    wrapper.setAttribute("role", "listitem");
     wrapper.append(anchor);
     placement.element.insertAdjacentElement(placement.position, wrapper);
   } else {
@@ -107,13 +107,25 @@ function renderButton() {
 function syncButtonLabel() {
   const button = document.getElementById(BUTTON_ID);
   if (button) {
-    button.textContent = getButtonLabel();
-    button.dataset.engine = getCurrentEngine();
+    const label = getButtonLabel();
+    const engine = getCurrentEngine();
+
+    if (button.textContent !== label) {
+      button.textContent = label;
+    }
+
+    if (button.dataset.engine !== engine) {
+      button.dataset.engine = engine;
+    }
   }
 
   const wrapper = document.getElementById(WRAPPER_ID);
   if (wrapper) {
-    wrapper.dataset.engine = getCurrentEngine();
+    const engine = getCurrentEngine();
+
+    if (wrapper.dataset.engine !== engine) {
+      wrapper.dataset.engine = engine;
+    }
   }
 }
 
@@ -126,7 +138,10 @@ function updateButtonHref() {
     return;
   }
 
-  button.href = buildMapsSearchUrl(query, getMapsContext());
+  const href = buildMapsSearchUrl(query, getMapsContext());
+  if (button.href !== href) {
+    button.href = href;
+  }
 }
 
 function removeButton() {
@@ -187,9 +202,7 @@ function isInGoogleTabs(element) {
 function findBingTabInsertionPoint() {
   const mapSelectors = [
     "#b-scopeList a[href*='/maps']",
-    "#b-scopeList a[href*='maps']",
-    "nav a[href*='/maps']",
-    "nav a[href*='maps']"
+    "#b-scopeList a[href*='maps']"
   ];
 
   for (const selector of mapSelectors) {
@@ -203,14 +216,13 @@ function findBingTabInsertionPoint() {
   }
 
   const tabsContainer = document.querySelector("#b-scopeList ul")
-    || document.querySelector("#b-scopeList")
-    || document.querySelector("nav ul");
+    || document.querySelector("#b-scopeList");
 
   return tabsContainer ? { element: tabsContainer, position: "beforeend", wrap: "li" } : null;
 }
 
 function isInBingTabs(element) {
-  return Boolean(element.closest("#b-scopeList, nav"));
+  return Boolean(element.closest("#b-scopeList"));
 }
 
 function observeSearchPageChanges() {
@@ -218,13 +230,23 @@ function observeSearchPageChanges() {
     return;
   }
 
-  observer = new MutationObserver(() => {
-    syncButton();
-  });
+  observer = new MutationObserver(scheduleSyncButton);
 
   observer.observe(document.body, {
     childList: true,
     subtree: true
+  });
+}
+
+function scheduleSyncButton() {
+  if (syncQueued) {
+    return;
+  }
+
+  syncQueued = true;
+  requestAnimationFrame(() => {
+    syncQueued = false;
+    syncButton();
   });
 }
 
