@@ -1,0 +1,50 @@
+name: Build and Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*' # Si attiva per tag come v0.1.0, v1.0.0, ecc.
+  workflow_dispatch: # Consente il rilascio manuale dall'interfaccia GitHub
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Necessario per creare la release e caricare gli asset
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create ZIP Package
+        run: |
+          mkdir -p dist
+          # Archivia solo i file necessari dell'estensione, escludendo file di sviluppo e OS
+          zip -r dist/cerca-indirizzo-su-google-maps.zip manifest.json LICENSE assets/ content/ options/ src/ -x "*.DS_Store" "*Thumbs.db"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/cerca-indirizzo-su-google-maps.zip
+          name: Rilascio ${{ github.ref_name }}
+          body: |
+            ## Rilascio di Cerca Indirizzo su Google Maps - ${{ github.ref_name }}
+            
+            Questo pacchetto contiene l'estensione pronta per essere installata ed utilizzata su **Google Chrome** e **Microsoft Edge**.
+            
+            ### Come installare l'estensione:
+            1. Scarica il file `cerca-indirizzo-su-google-maps.zip` allegato a questa release.
+            2. Estrai il file `.zip` in una cartella a tua scelta sul tuo computer.
+            3. Apri il tuo browser alla pagina di gestione delle estensioni:
+               - Chrome: `chrome://extensions/`
+               - Edge: `edge://extensions/`
+            4. Attiva la **Modalità sviluppatore** (Developer mode) in alto a destra.
+            5. Fai clic su **Carica estensione non pacchettizzata** (Load unpacked) in alto a sinistra.
+            6. Seleziona la cartella in cui hai estratto lo ZIP.
+            
+            *Fatto con amore a Catania 🌋*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -51,6 +51,29 @@ Dal popup o dalla pagina opzioni puoi gestire:
 - Google Chrome con supporto Manifest V3.
 - Microsoft Edge con supporto Manifest V3.
 
+### Packaging e Rilascio
+
+#### Packaging Locale (Windows)
+Se desideri creare un pacchetto ZIP locale per test o distribuzione manuale:
+1. Apri PowerShell nella cartella del progetto.
+2. Esegui lo script:
+   ```powershell
+   ./package.ps1
+   ```
+3. Troverai il pacchetto ZIP pronto all'uso in `dist/cerca-indirizzo-su-google-maps.zip`.
+
+#### Rilascio automatico su GitHub
+Il repository è configurato con un workflow GitHub Actions che crea automaticamente una Release ufficiale e allega lo ZIP pronto:
+1. Crea un tag locale (es. `v0.1.0`):
+   ```bash
+   git tag v0.1.0
+   ```
+2. Invia il tag su GitHub:
+   ```bash
+   git push origin v0.1.0
+   ```
+3. GitHub Actions creerà automaticamente una nuova Release caricando il file `.zip` come asset.
+
 ## English
 
 ### Features
@@ -94,10 +117,34 @@ From the popup or options page you can configure:
 - Google Chrome with Manifest V3 support.
 - Microsoft Edge with Manifest V3 support.
 
+### Packaging & Releasing
+
+#### Local Packaging (Windows)
+If you want to create a local ZIP package for testing or manual distribution:
+1. Open PowerShell in the project root directory.
+2. Run the script:
+   ```powershell
+   ./package.ps1
+   ```
+3. You will find the ready-to-use ZIP package at `dist/cerca-indirizzo-su-google-maps.zip`.
+
+#### Automated GitHub Release
+The repository is set up with a GitHub Actions workflow that automatically creates an official Release with the ZIP attached:
+1. Create a local tag (e.g. `v0.1.0`):
+   ```bash
+   git tag v0.1.0
+   ```
+2. Push the tag to GitHub:
+   ```bash
+   git push origin v0.1.0
+   ```
+3. GitHub Actions will automatically create a new Release and upload the `.zip` file as an asset.
+
 ## Project Structure
 
 ```text
 manifest.json
+package.ps1
 src/
   background.js
   settings.js
@@ -108,8 +155,6 @@ options/
   options.html
   options.css
   options.js
-docs/
-  PLAN.md
 LICENSE
 ```
 
